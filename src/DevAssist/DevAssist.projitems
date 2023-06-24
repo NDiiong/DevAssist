@@ -9,6 +9,8 @@
     <Import_RootNamespace>DevAssist</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)commands\intellisense\ConfigureAwaitCompletionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)commands\intellisense\GuidCompletionProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DevAssistPackage.cs" />
   </ItemGroup>
   <ItemGroup>
