@@ -1,13 +1,3 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Completion;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Tags;
-using System;
-using System.Collections.Immutable;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace DevAssist
 {
     [ExportCompletionProvider(nameof(GuidCompletionProvider), LanguageNames.CSharp)]
@@ -139,7 +129,7 @@ namespace DevAssist
         }
     }
 
-    enum GuidInsertionType
+    internal enum GuidInsertionType
     {
         None,
         Constructor,

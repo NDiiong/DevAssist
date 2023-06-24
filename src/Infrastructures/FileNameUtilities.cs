@@ -1,5 +1,3 @@
-using System;
-
 namespace DevAssist
 {
     public static class FileNameUtilities
