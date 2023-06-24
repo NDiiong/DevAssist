@@ -139,7 +139,7 @@ namespace DevAssist
         }
     }
 
-    internal enum GuidInsertionType
+    enum GuidInsertionType
     {
         None,
         Constructor,
