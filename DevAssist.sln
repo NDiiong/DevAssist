@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevAssist", "src\DevAssist.csproj", "{F1591CA4-FA51-418A-B208-9F3A2EC52CCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevAssist.Vs2022", "src\DevAssist.Vs2022\DevAssist.Vs2022.csproj", "{F1591CA4-FA51-418A-B208-9F3A2EC52CCE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DevAssist", "src\DevAssist\DevAssist.shproj", "{DA40311D-BF06-451A-9D49-C87FBBAAEF3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,5 +35,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B89B4BB-4B39-4E50-8CF2-BAD7A4FD17A5}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\DevAssist\DevAssist.projitems*{da40311d-bf06-451a-9d49-c87fbbaaef3a}*SharedItemsImports = 13
+		src\DevAssist\DevAssist.projitems*{f1591ca4-fa51-418a-b208-9f3a2ec52cce}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal
