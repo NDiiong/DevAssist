@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevAssist", "DevAssist\DevAssist.csproj", "{F1591CA4-FA51-418A-B208-9F3A2EC52CCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevAssist", "src\DevAssist.csproj", "{F1591CA4-FA51-418A-B208-9F3A2EC52CCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
