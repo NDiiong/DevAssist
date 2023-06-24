@@ -10,8 +10,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)commands\intellisense\ConfigureAwaitCompletionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)commands\intellisense\FileCompletionProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)commands\intellisense\GuidCompletionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)commands\intellisense\MoqCompletionProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DevAssistPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)infrastructures\FileNameUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)infrastructures\PathUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Assets\" />
