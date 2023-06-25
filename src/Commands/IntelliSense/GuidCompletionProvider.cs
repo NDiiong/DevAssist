@@ -9,11 +9,12 @@ namespace DevAssist
         {
             try
             {
-                if (context.Document.TryGetSyntaxTree(out SyntaxTree tree))
+                if (context.Document.TryGetSyntaxTree(out SyntaxTree tree) && context.Document.SupportsSemanticModel)
                 {
                     SyntaxNode root = await tree.GetRootAsync();
+                    SemanticModel semanticModel = await context.Document.GetSemanticModelAsync();
                     SyntaxNode node = root.FindNode(context.CompletionListSpan);
-                    GuidInsertionType insertionType = IsGuid(node);
+                    GuidInsertionType insertionType = IsGuid(semanticModel, node);
                     if (insertionType != GuidInsertionType.None)
                         context.AddItem(CreateCompletionItem(insertionType));
                 }
@@ -32,26 +33,14 @@ namespace DevAssist
         private static CompletionItem CreateCompletionItem(GuidInsertionType insertionType)
         {
             string value = Guid.NewGuid().ToString().ToUpper();
-
-            string insertionText;
-            switch (insertionType)
+            var insertionText = insertionType switch
             {
-                case GuidInsertionType.Constructor:
-                    insertionText = $"Guid(\"{value}\")";
-                    break;
-
-                case GuidInsertionType.ValueWithQuotes:
-                    insertionText = $"\"{value}\"";
-                    break;
-
-                case GuidInsertionType.Value:
-                    insertionText = value;
-                    break;
-
-                default:
-                    throw new NotSupportedException($"Not supported value '{insertionType}'.");
-            }
-
+                GuidInsertionType.Constructor => $"Guid(\"{value}\")",
+                GuidInsertionType.Assignment => $"new Guid(\"{value}\")",
+                GuidInsertionType.ValueWithQuotes => $"\"{value}\"",
+                GuidInsertionType.Value => value,
+                _ => throw new NotSupportedException($"Not supported value '{insertionType}'."),
+            };
             var tags = ImmutableArray.Create(WellKnownTags.Structure);
             var properties = ImmutableDictionary.Create<string, string>().Add(Property, value);
             var rules = CompletionItemRules.Create(matchPriority: MatchPriority.Preselect);
@@ -66,9 +55,18 @@ namespace DevAssist
             );
         }
 
-        private static GuidInsertionType IsGuid(SyntaxNode node)
+        private static GuidInsertionType IsGuid(SemanticModel semanticModel, SyntaxNode node)
         {
-            if (node is ObjectCreationExpressionSyntax objectCreation)
+            if (node is AssignmentExpressionSyntax assignment)
+            {
+                if (assignment.Left is MemberAccessExpressionSyntax memberAccess)
+                {
+                    var typeOfExpression = semanticModel.GetTypeInfo(memberAccess);
+                    if (IsGuid(typeOfExpression))
+                        return GuidInsertionType.Assignment;
+                }
+            }
+            else if (node is ObjectCreationExpressionSyntax objectCreation)
             {
                 if (objectCreation.Parent is EqualsValueClauseSyntax equals)
                 {
@@ -83,6 +81,15 @@ namespace DevAssist
                     else if (equals.Parent is PropertyDeclarationSyntax propertyDeclaration)
                     {
                         if (IsGuid(propertyDeclaration.Type))
+                            return GuidInsertionType.Constructor;
+                    }
+                }
+                else if (objectCreation.Parent is AssignmentExpressionSyntax assignment2)
+                {
+                    if (assignment2.Left is MemberAccessExpressionSyntax memberAccess2)
+                    {
+                        var typeOfExpression = semanticModel.GetTypeInfo(memberAccess2);
+                        if (IsGuid(typeOfExpression))
                             return GuidInsertionType.Constructor;
                     }
                 }
@@ -127,6 +134,11 @@ namespace DevAssist
 
             return false;
         }
+
+        private static bool IsGuid(TypeInfo typeInfo)
+        {
+            return typeInfo.Type.Name == nameof(Guid);
+        }
     }
 
     internal enum GuidInsertionType
@@ -134,6 +146,7 @@ namespace DevAssist
         None,
         Constructor,
         ValueWithQuotes,
-        Value
+        Value,
+        Assignment
     }
 }
