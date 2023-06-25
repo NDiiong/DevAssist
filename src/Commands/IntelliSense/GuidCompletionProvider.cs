@@ -3,8 +3,6 @@ namespace DevAssist
     [ExportCompletionProvider(nameof(GuidCompletionProvider), LanguageNames.CSharp)]
     internal class GuidCompletionProvider : CompletionProvider
     {
-        public const string Property = "Guid";
-
         public override async Task ProvideCompletionsAsync(CompletionContext context)
         {
             try
@@ -24,7 +22,7 @@ namespace DevAssist
 
         public override Task<CompletionDescription> GetDescriptionAsync(Document document, CompletionItem item, CancellationToken cancellationToken)
         {
-            if (item.Properties.TryGetValue(Property, out string value))
+            if (item.Properties.TryGetValue("Guid", out string value))
                 return Task.FromResult(CompletionDescription.FromText(value));
 
             return base.GetDescriptionAsync(document, item, cancellationToken);
@@ -42,7 +40,7 @@ namespace DevAssist
                 _ => throw new NotSupportedException($"Not supported value '{insertionType}'."),
             };
             var tags = ImmutableArray.Create(WellKnownTags.Structure);
-            var properties = ImmutableDictionary.Create<string, string>().Add(Property, value);
+            var properties = ImmutableDictionary.Create<string, string>().Add("Guid", value);
             var rules = CompletionItemRules.Create(matchPriority: MatchPriority.Preselect);
 
             return CompletionItem.Create(
