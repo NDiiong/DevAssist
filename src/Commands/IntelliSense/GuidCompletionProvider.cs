@@ -39,7 +39,7 @@ namespace DevAssist
                 InsertionType.Value => value,
                 _ => throw new NotSupportedException($"Not supported value '{insertionType}'."),
             };
-            var tags = ImmutableArray.Create(WellKnownTags.Structure);
+            var tags = ImmutableArray.Create(WellKnownTags.Method, WellKnownTags.Public);
             var properties = ImmutableDictionary.Create<string, string>().Add("Guid", value);
             var rules = CompletionItemRules.Create(matchPriority: MatchPriority.Preselect);
 

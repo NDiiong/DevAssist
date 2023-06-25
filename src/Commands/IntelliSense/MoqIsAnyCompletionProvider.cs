@@ -33,16 +33,17 @@ namespace DevAssist
                 {
                     var matchingMockedMethods = GetAllMatchingMockedMethodSymbolsFromSetupMethodInvocation(semanticModel, setupMethodInvocation);
 
+                    var tags = ImmutableArray.Create(WellKnownTags.Method, WellKnownTags.Public);
                     foreach (IMethodSymbol matchingMockedMethodSymbol in matchingMockedMethods.Where(m => m.Parameters.Any()))
                     {
                         if (tokenAtCursor.IsKind(SyntaxKind.OpenParenToken))
                         {
                             var fullMethodHelper = string.Join(", ", matchingMockedMethodSymbol.Parameters.Select(p => "It.IsAny<" + p.Type.ToMinimalDisplayString(semanticModel, mockedMethodArgumentList.SpanStart) + ">()"));
-                            context.AddItem(CompletionItem.Create(fullMethodHelper));
+                            context.AddItem(CompletionItem.Create(fullMethodHelper, tags: tags));
                             if (matchingMockedMethodSymbol.Parameters.Length > 1)
                             {
                                 var oneArgumentHelper = "It.IsAny<" + matchingMockedMethodSymbol.Parameters[0].Type.ToMinimalDisplayString(semanticModel, mockedMethodArgumentList.SpanStart) + ">()";
-                                context.AddItem(CompletionItem.Create(oneArgumentHelper));
+                                context.AddItem(CompletionItem.Create(oneArgumentHelper, tags: tags));
                             }
                         }
                         else
@@ -52,7 +53,7 @@ namespace DevAssist
                             if (matchingMockedMethodSymbol.Parameters.Length > paramIdx)
                             {
                                 var oneArgumentHelper = "It.IsAny<" + matchingMockedMethodSymbol.Parameters[paramIdx].Type.ToMinimalDisplayString(semanticModel, mockedMethodArgumentList.SpanStart) + ">()";
-                                context.AddItem(CompletionItem.Create(oneArgumentHelper));
+                                context.AddItem(CompletionItem.Create(oneArgumentHelper, tags: tags));
                             }
                         }
                     }

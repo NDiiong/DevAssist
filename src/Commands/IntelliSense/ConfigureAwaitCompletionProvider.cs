@@ -20,23 +20,11 @@ namespace DevAssist
                 var typeOfExpression = semanticModel.GetTypeInfo(currentNode.Expression);
                 if (typeOfExpression.Type.Name == "Task" && typeOfExpression.Type.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks")
                 {
-                    context.AddItem(CompletionItem.Create("ConfigureAwait(false)", tags: ImmutableArray.Create(new[] { "Method", "Public" })));
+                    var tags = ImmutableArray.Create(WellKnownTags.Method, WellKnownTags.Public);
+                    context.AddItem(CompletionItem.Create("ConfigureAwait(false)", tags: tags));
                 }
             }
             catch { }
-        }
-
-        public override Task<CompletionDescription> GetDescriptionAsync(Document document, CompletionItem item, CancellationToken cancellationToken)
-        {
-            var completionDescription = CompletionDescription.Create(
-                ImmutableArray.Create(new TaggedText[] {
-                    new TaggedText(TextTags.Text, "Just a shortcut for the "),
-                    new TaggedText(TextTags.Class, "Task"),
-                    new TaggedText(TextTags.Method, ".ConfigureAwait"),
-                    new TaggedText(TextTags.Text, " method.")
-            }));
-
-            return Task.FromResult(completionDescription);
         }
 
         private static MemberAccessExpressionSyntax GetCurrentMemberAccess(SyntaxNode node, int currentPosition)
