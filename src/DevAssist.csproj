@@ -76,7 +76,7 @@
     <Compile Include="Commands\IntelliSense\ConfigureAwaitCompletionProvider.cs" />
     <Compile Include="Commands\IntelliSense\FileCompletionProvider.cs" />
     <Compile Include="Commands\IntelliSense\GuidCompletionProvider.cs" />
-    <Compile Include="Commands\IntelliSense\MoqCompletionProvider.cs" />
+    <Compile Include="Commands\IntelliSense\MoqIsAnyCompletionProvider.cs" />
     <Compile Include="Commands\ToolWindows\DockDefaultToolWindows.cs" />
     <Compile Include="DevAssistPackage.cs" />
     <Compile Include="Infrastructures\FileNameUtilities.cs" />

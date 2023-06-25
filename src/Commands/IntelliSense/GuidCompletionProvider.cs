@@ -12,8 +12,8 @@ namespace DevAssist
                     SyntaxNode root = await tree.GetRootAsync();
                     SemanticModel semanticModel = await context.Document.GetSemanticModelAsync();
                     SyntaxNode node = root.FindNode(context.CompletionListSpan);
-                    GuidInsertionType insertionType = IsGuid(semanticModel, node);
-                    if (insertionType != GuidInsertionType.None)
+                    InsertionType insertionType = IsGuid(semanticModel, node);
+                    if (insertionType != InsertionType.None)
                         context.AddItem(CreateCompletionItem(insertionType));
                 }
             }
@@ -28,15 +28,15 @@ namespace DevAssist
             return base.GetDescriptionAsync(document, item, cancellationToken);
         }
 
-        private static CompletionItem CreateCompletionItem(GuidInsertionType insertionType)
+        private static CompletionItem CreateCompletionItem(InsertionType insertionType)
         {
             string value = Guid.NewGuid().ToString().ToUpper();
             var insertionText = insertionType switch
             {
-                GuidInsertionType.Constructor => $"Guid(\"{value}\")",
-                GuidInsertionType.Assignment => $"new Guid(\"{value}\")",
-                GuidInsertionType.ValueWithQuotes => $"\"{value}\"",
-                GuidInsertionType.Value => value,
+                InsertionType.Constructor => $"Guid(\"{value}\")",
+                InsertionType.Assignment => $"new Guid(\"{value}\")",
+                InsertionType.ValueWithQuotes => $"\"{value}\"",
+                InsertionType.Value => value,
                 _ => throw new NotSupportedException($"Not supported value '{insertionType}'."),
             };
             var tags = ImmutableArray.Create(WellKnownTags.Structure);
@@ -53,7 +53,7 @@ namespace DevAssist
             );
         }
 
-        private static GuidInsertionType IsGuid(SemanticModel semanticModel, SyntaxNode node)
+        private static InsertionType IsGuid(SemanticModel semanticModel, SyntaxNode node)
         {
             if (node is AssignmentExpressionSyntax assignment)
             {
@@ -61,7 +61,7 @@ namespace DevAssist
                 {
                     var typeOfExpression = semanticModel.GetTypeInfo(memberAccess);
                     if (IsGuid(typeOfExpression))
-                        return GuidInsertionType.Assignment;
+                        return InsertionType.Assignment;
                 }
             }
             else if (node is ObjectCreationExpressionSyntax objectCreation)
@@ -73,13 +73,13 @@ namespace DevAssist
                         if (variableDeclarator.Parent is VariableDeclarationSyntax variableDeclaration)
                         {
                             if (IsGuid(variableDeclaration.Type))
-                                return GuidInsertionType.Constructor;
+                                return InsertionType.Constructor;
                         }
                     }
                     else if (equals.Parent is PropertyDeclarationSyntax propertyDeclaration)
                     {
                         if (IsGuid(propertyDeclaration.Type))
-                            return GuidInsertionType.Constructor;
+                            return InsertionType.Constructor;
                     }
                 }
                 else if (objectCreation.Parent is AssignmentExpressionSyntax assignment2)
@@ -88,7 +88,7 @@ namespace DevAssist
                     {
                         var typeOfExpression = semanticModel.GetTypeInfo(memberAccess2);
                         if (IsGuid(typeOfExpression))
-                            return GuidInsertionType.Constructor;
+                            return InsertionType.Constructor;
                     }
                 }
             }
@@ -97,7 +97,7 @@ namespace DevAssist
                 if (argumentList.Parent is ObjectCreationExpressionSyntax objectCreation1)
                 {
                     if (IsGuid(objectCreation1.Type))
-                        return GuidInsertionType.ValueWithQuotes;
+                        return InsertionType.ValueWithQuotes;
                 }
             }
             else if (node is ArgumentSyntax argument)
@@ -111,14 +111,14 @@ namespace DevAssist
                             if (argumentList1.Parent is ObjectCreationExpressionSyntax objectCreation2)
                             {
                                 if (IsGuid(objectCreation2.Type))
-                                    return GuidInsertionType.Value;
+                                    return InsertionType.Value;
                             }
                         }
                     }
                 }
             }
 
-            return GuidInsertionType.None;
+            return InsertionType.None;
         }
 
         private static bool IsGuid(TypeSyntax type)
@@ -139,7 +139,7 @@ namespace DevAssist
         }
     }
 
-    internal enum GuidInsertionType
+    internal enum InsertionType
     {
         None,
         Constructor,
