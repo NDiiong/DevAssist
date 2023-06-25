@@ -4,6 +4,7 @@ global using Microsoft.CodeAnalysis.Completion;
 global using Microsoft.CodeAnalysis.CSharp;
 global using Microsoft.CodeAnalysis.CSharp.Syntax;
 global using Microsoft.CodeAnalysis.Tags;
+global using Microsoft.VisualStudio;
 global using Microsoft.VisualStudio.Shell;
 global using System;
 global using System.Collections.Immutable;
@@ -17,6 +18,9 @@ namespace DevAssist
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(DevAssistPackage.PackageGuidString)]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideAutoLoad(VSConstants.VsEditorFactoryGuid.TextEditor_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [InstalledProductRegistration("DevAssist", "DevAssist", "1.0")]
     public sealed class DevAssistPackage : AsyncPackage
     {
         public const string PackageGuidString = "a50daca1-ee7e-472a-9d48-c2879b05068d";
