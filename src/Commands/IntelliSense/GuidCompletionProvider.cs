@@ -39,7 +39,7 @@ namespace DevAssist
                 InsertionType.Value => value,
                 _ => throw new NotSupportedException($"Not supported value '{insertionType}'."),
             };
-            var tags = ImmutableArray.Create(WellKnownTags.Method, WellKnownTags.Public);
+            var tags = ImmutableArray.Create(WellKnownTags.Structure);
             var properties = ImmutableDictionary.Create<string, string>().Add("Guid", value);
             var rules = CompletionItemRules.Create(matchPriority: MatchPriority.Preselect);
 
@@ -55,7 +55,28 @@ namespace DevAssist
 
         private static InsertionType IsGuid(SemanticModel semanticModel, SyntaxNode node)
         {
-            if (node is AssignmentExpressionSyntax assignment)
+            if (node is ExpressionStatementSyntax expressionStatementSyntax)
+            {
+                if (expressionStatementSyntax.Expression is AssignmentExpressionSyntax _assignment && _assignment.Left is MemberAccessExpressionSyntax _memberAccess)
+                {
+                    var typeOfExpression = semanticModel.GetTypeInfo(_memberAccess);
+                    if (IsGuid(typeOfExpression))
+                        return InsertionType.Assignment;
+                }
+            }
+            else if (node is GlobalStatementSyntax globalStatement)
+            {
+                if (globalStatement.Statement is ExpressionStatementSyntax expressionStatement)
+                {
+                    if (expressionStatement.Expression is AssignmentExpressionSyntax _assignment && _assignment.Left is MemberAccessExpressionSyntax _memberAccess)
+                    {
+                        var typeOfExpression = semanticModel.GetTypeInfo(_memberAccess);
+                        if (IsGuid(typeOfExpression))
+                            return InsertionType.Assignment;
+                    }
+                }
+            }
+            else if (node is AssignmentExpressionSyntax assignment)
             {
                 if (assignment.Left is MemberAccessExpressionSyntax memberAccess)
                 {
