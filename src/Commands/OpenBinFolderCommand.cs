@@ -6,6 +6,7 @@ using Project = EnvDTE.Project;
 
 namespace DevAssist
 {
+    //[Command(PackageGuids.guidPackageCmdSetString, PackageIds.OpenBinFolder)]
     internal sealed class OpenBinFolderCommand : BaseCommand<OpenBinFolderCommand>
     {
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
