@@ -70,6 +70,7 @@
   <ItemGroup>
     <Folder Include="Assets\" />
     <Folder Include="Commands\Build\" />
+    <Folder Include="Commands\General\" />
     <Folder Include="Options\" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +78,7 @@
     <Compile Include="Commands\IntelliSense\FileCompletionProvider.cs" />
     <Compile Include="Commands\IntelliSense\GuidCompletionProvider.cs" />
     <Compile Include="Commands\IntelliSense\MoqIsAnyCompletionProvider.cs" />
+    <Compile Include="Commands\OpenBinFolderCommand.cs" />
     <Compile Include="Commands\ToolWindows\DockDefaultToolWindows.cs" />
     <Compile Include="DevAssistPackage.cs" />
     <Compile Include="Infrastructures\FileNameUtilities.cs" />

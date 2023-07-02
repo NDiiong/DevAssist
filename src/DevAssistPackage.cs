@@ -13,7 +13,6 @@ global using System.Runtime.InteropServices;
 global using System.Threading;
 global using System.Threading.Tasks;
 global using Task = System.Threading.Tasks.Task;
-using EnvDTE;
 
 namespace DevAssist
 {
@@ -26,28 +25,10 @@ namespace DevAssist
     {
         public const string PackageGuidString = "a50daca1-ee7e-472a-9d48-c2879b05068d";
 
-        private readonly Lazy<DTE> _dte = new(() =>
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            return ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE;
-        }, true);
-
-        private DTE Dte => _dte.Value;
-
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-        }
-
-        private async Task ShowTaskListAsync()
-        {
-            //JAVIERS: DELAY THIS EXECUTION TO OPEN THE WINDOW AFTER EVERYTHING IS LOADED
-            await JoinableTaskFactory.SwitchToMainThreadAsync(DisposalToken);
-            await System.Threading.Tasks.Task.Delay(1000);
-
-            var window = Dte.Windows.Item(EnvDTE.Constants.vsWindowKindTaskList);
-
-            window.Activate();
+            await this.RegisterCommandsAsync();
         }
     }
 }
