@@ -34,16 +34,17 @@ namespace DevAssist
                     var matchingMockedMethods = GetAllMatchingMockedMethodSymbolsFromSetupMethodInvocation(semanticModel, setupMethodInvocation);
 
                     var tags = ImmutableArray.Create(WellKnownTags.Method, WellKnownTags.Public);
+                    var rules = CompletionItemRules.Create(matchPriority: MatchPriority.Preselect);
                     foreach (IMethodSymbol matchingMockedMethodSymbol in matchingMockedMethods.Where(m => m.Parameters.Any()))
                     {
                         if (tokenAtCursor.IsKind(SyntaxKind.OpenParenToken))
                         {
                             var fullMethodHelper = string.Join(", ", matchingMockedMethodSymbol.Parameters.Select(p => "It.IsAny<" + p.Type.ToMinimalDisplayString(semanticModel, mockedMethodArgumentList.SpanStart) + ">()"));
-                            context.AddItem(CompletionItem.Create(fullMethodHelper, tags: tags));
+                            context.AddItem(CompletionItem.Create(fullMethodHelper, tags: tags, sortText: "0", rules: rules));
                             if (matchingMockedMethodSymbol.Parameters.Length > 1)
                             {
                                 var oneArgumentHelper = "It.IsAny<" + matchingMockedMethodSymbol.Parameters[0].Type.ToMinimalDisplayString(semanticModel, mockedMethodArgumentList.SpanStart) + ">()";
-                                context.AddItem(CompletionItem.Create(oneArgumentHelper, tags: tags));
+                                context.AddItem(CompletionItem.Create(oneArgumentHelper, tags: tags, sortText: "0", rules: rules));
                             }
                         }
                         else
@@ -53,7 +54,7 @@ namespace DevAssist
                             if (matchingMockedMethodSymbol.Parameters.Length > paramIdx)
                             {
                                 var oneArgumentHelper = "It.IsAny<" + matchingMockedMethodSymbol.Parameters[paramIdx].Type.ToMinimalDisplayString(semanticModel, mockedMethodArgumentList.SpanStart) + ">()";
-                                context.AddItem(CompletionItem.Create(oneArgumentHelper, tags: tags));
+                                context.AddItem(CompletionItem.Create(oneArgumentHelper, tags: tags, sortText: "0", rules: rules));
                             }
                         }
                     }
