@@ -12,7 +12,8 @@ namespace DevAssist
                     SyntaxNode root = await tree.GetRootAsync();
                     SemanticModel semanticModel = await context.Document.GetSemanticModelAsync();
                     SyntaxNode node = root.FindNode(context.CompletionListSpan);
-                    InsertionType insertionType = IsGuid(semanticModel, node);
+
+                    InsertionType insertionType = GuidSyntax.IsGuid(semanticModel, node);
                     if (insertionType != InsertionType.None)
                         context.AddItem(CreateCompletionItem(insertionType));
                 }
@@ -46,20 +47,23 @@ namespace DevAssist
             return CompletionItem.Create(
                 insertionText,
                 insertionText,
-                insertionText,
-                tags: tags,
+                sortText: "0",
                 properties: properties,
+                tags: tags,
                 rules: rules
             );
         }
+    }
 
-        private static InsertionType IsGuid(SemanticModel semanticModel, SyntaxNode node)
+    internal static class GuidSyntax
+    {
+        internal static InsertionType IsGuid(SemanticModel semanticModel, SyntaxNode node)
         {
             if (node is ExpressionStatementSyntax expressionStatementSyntax)
             {
-                if (expressionStatementSyntax.Expression is AssignmentExpressionSyntax _assignment && _assignment.Left is MemberAccessExpressionSyntax _memberAccess)
+                if (expressionStatementSyntax.Expression is AssignmentExpressionSyntax assignmentExpression && assignmentExpression.Left is MemberAccessExpressionSyntax memberAccessExpressionSyntax)
                 {
-                    var typeOfExpression = semanticModel.GetTypeInfo(_memberAccess);
+                    var typeOfExpression = semanticModel.GetTypeInfo(memberAccessExpressionSyntax);
                     if (IsGuid(typeOfExpression))
                         return InsertionType.Assignment;
                 }
@@ -68,9 +72,9 @@ namespace DevAssist
             {
                 if (globalStatement.Statement is ExpressionStatementSyntax expressionStatement)
                 {
-                    if (expressionStatement.Expression is AssignmentExpressionSyntax _assignment && _assignment.Left is MemberAccessExpressionSyntax _memberAccess)
+                    if (expressionStatement.Expression is AssignmentExpressionSyntax assignmentExpression && assignmentExpression.Left is MemberAccessExpressionSyntax memberAccessExpressionSyntax)
                     {
-                        var typeOfExpression = semanticModel.GetTypeInfo(_memberAccess);
+                        var typeOfExpression = semanticModel.GetTypeInfo(memberAccessExpressionSyntax);
                         if (IsGuid(typeOfExpression))
                             return InsertionType.Assignment;
                     }
@@ -78,7 +82,13 @@ namespace DevAssist
             }
             else if (node is AssignmentExpressionSyntax assignment)
             {
-                if (assignment.Left is MemberAccessExpressionSyntax memberAccess)
+                if (node.Parent is InitializerExpressionSyntax)
+                {
+                    var symbolInfo = semanticModel.GetSymbolInfo(assignment.Left);
+                    if (IsGuid(symbolInfo))
+                        return InsertionType.Assignment;
+                }
+                else if (assignment.Left is MemberAccessExpressionSyntax memberAccess)
                 {
                     var typeOfExpression = semanticModel.GetTypeInfo(memberAccess);
                     if (IsGuid(typeOfExpression))
@@ -125,11 +135,11 @@ namespace DevAssist
             {
                 if (argument.Expression is LiteralExpressionSyntax literalExpression)
                 {
-                    if (literalExpression.Kind() == SyntaxKind.StringLiteralExpression && literalExpression.Token.ValueText == String.Empty)
+                    if (literalExpression.Kind() == SyntaxKind.StringLiteralExpression && literalExpression.Token.ValueText?.Length == 0)
                     {
-                        if (argument.Parent is ArgumentListSyntax argumentList1)
+                        if (argument.Parent is ArgumentListSyntax argumentListSyntax)
                         {
-                            if (argumentList1.Parent is ObjectCreationExpressionSyntax objectCreation2)
+                            if (argumentListSyntax.Parent is ObjectCreationExpressionSyntax objectCreation2)
                             {
                                 if (IsGuid(objectCreation2.Type))
                                     return InsertionType.Value;
@@ -137,6 +147,9 @@ namespace DevAssist
                         }
                     }
                 }
+            }
+            else if (node is InitializerExpressionSyntax initializerExpression)
+            {
             }
 
             return InsertionType.None;
@@ -150,6 +163,14 @@ namespace DevAssist
                 if (name == nameof(Guid) || name == typeof(Guid).FullName)
                     return true;
             }
+
+            return false;
+        }
+
+        private static bool IsGuid(SymbolInfo symbol)
+        {
+            if (symbol.Symbol is IPropertySymbol propertySymbol)
+                return propertySymbol.Type.Name == nameof(Guid);
 
             return false;
         }

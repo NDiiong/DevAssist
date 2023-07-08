@@ -72,8 +72,13 @@ namespace DevAssist
 
         internal static bool IsMoqSetupMethod(SemanticModel semanticModel, InvocationExpressionSyntax invocation)
         {
-            var method = invocation.Expression as MemberAccessExpressionSyntax;
-            return IsMoqSetupMethod(semanticModel, method);
+            if (invocation != null)
+            {
+                var method = invocation.Expression as MemberAccessExpressionSyntax;
+                return IsMoqSetupMethod(semanticModel, method);
+            }
+
+            return false;
         }
 
         internal static bool IsMoqSetupMethod(SemanticModel semanticModel, MemberAccessExpressionSyntax method)
